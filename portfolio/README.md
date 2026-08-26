@@ -1,4 +1,4 @@
-# Portfolio
+cd# Portfolio
 
 Portfolio modulaire — Next.js 15 (App Router) + Supabase + Tailwind CSS v4,
 avec galerie de projets, panel admin (upload multi-images, positionnement
@@ -22,7 +22,7 @@ Sur [supabase.com](https://supabase.com), crée un nouveau projet.
 ### 2. Variables d'environnement
 
 ```bash
-cp .env.local.example .env.local
+cp .env .env.local
 ```
 
 Remplis `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY`
