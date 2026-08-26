@@ -1,0 +1,103 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Design tokens.
+ * Source of truth for Tailwind v4 (CSS-first config, no tailwind.config.ts
+ * needed for this to work). tailwind.config.ts still exists at the repo
+ * root as a typed mirror of these values for editor tooling / future
+ * plugins, but this file is what actually generates the utilities.
+ *
+ * Brand palette is the exact set from the art-direction brief — do not
+ * introduce new colors without updating both places.
+ */
+:root {
+  /* Brand palette (brief-mandated hex values) */
+  --brand-bg: #f5f5f0; /* fond principal */
+  --brand-ink: #1a1a1a; /* texte principal */
+  --brand-ink-muted: #6b6b6b; /* texte secondaire */
+  --brand-card: #3d2b2b; /* fond carte CV, bordeaux fonce */
+  --brand-card-foreground: #f5f5f0; /* texte sur fond fonce */
+  --brand-accent: #8b4513; /* terre de sienne, tres discret */
+
+  /* shadcn/ui semantic tokens — mapped onto the same palette family so the
+     admin UI feels like one product, kept distinct from --brand-card so
+     ordinary <Card> surfaces (admin tables, forms) don't turn bordeaux. */
+  --background: var(--brand-bg);
+  --foreground: var(--brand-ink);
+  --card: #ffffff;
+  --card-foreground: var(--brand-ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--brand-ink);
+  --primary: var(--brand-ink);
+  --primary-foreground: var(--brand-bg);
+  --secondary: #eae8e1;
+  --secondary-foreground: var(--brand-ink);
+  --muted: #eae8e1;
+  --muted-foreground: var(--brand-ink-muted);
+  --accent: #eae8e1;
+  --accent-foreground: var(--brand-ink);
+  --destructive: #a3342b;
+  --destructive-foreground: #f5f5f0;
+  --border: #e1ded3;
+  --input: #e1ded3;
+  --ring: var(--brand-accent);
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-muted: var(--brand-ink-muted);
+  --color-brand-card: var(--brand-card);
+  --color-brand-card-foreground: var(--brand-card-foreground);
+  --color-brand-accent: var(--brand-accent);
+
+  --radius-sm: calc(var(--radius) - 0.125rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.125rem);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-body);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  ::selection {
+    background: var(--brand-accent);
+    color: var(--brand-card-foreground);
+  }
+}
+
+@layer utilities {
+  /* Small-caps editorial label: "Direction artistique", "Scénographie", nav links */
+  .label-eyebrow {
+    @apply font-sans uppercase text-xs tracking-[0.1em] text-brand-ink;
+  }
+}
