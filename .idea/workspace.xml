@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2810c5e-5457-4724-af8a-f9a133f844ec" name="Changes" comment="update of the package">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middleware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/middleware.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +81,7 @@
       <updated>1787781777957</updated>
       <workItem from="1787781778987" duration="1751000" />
       <workItem from="1787784010798" duration="3388000" />
-      <workItem from="1787787550001" duration="2291000" />
+      <workItem from="1787787550001" duration="4184000" />
     </task>
     <task id="LOCAL-00001" summary="update of the package">
       <option name="closed" value="true" />
@@ -123,7 +123,55 @@
       <option name="project" value="LOCAL" />
       <updated>1787789605959</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="update of the package">
+      <option name="closed" value="true" />
+      <created>1787789975303</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1787789975303</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update of the package">
+      <option name="closed" value="true" />
+      <created>1787789981451</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1787789981451</updated>
+    </task>
+    <task id="LOCAL-00008" summary="update of the package">
+      <option name="closed" value="true" />
+      <created>1787789999570</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1787789999570</updated>
+    </task>
+    <task id="LOCAL-00009" summary="update of the package">
+      <option name="closed" value="true" />
+      <created>1787791318884</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1787791318884</updated>
+    </task>
+    <task id="LOCAL-00010" summary="update of the package">
+      <option name="closed" value="true" />
+      <created>1787791535935</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1787791535935</updated>
+    </task>
+    <task id="LOCAL-00011" summary="update of the package">
+      <option name="closed" value="true" />
+      <created>1787791550891</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1787791550891</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
