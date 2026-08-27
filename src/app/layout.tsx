@@ -4,6 +4,8 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE } from "@/lib/site-config";
+import { createClient } from "@/lib/supabase/server";
+import type { SiteSettings } from "@/lib/types";
 
 const fontDisplay = Playfair_Display({
   variable: "--font-display",
@@ -17,12 +19,31 @@ const fontBody = Inter({
   weight: ["400", "500", "600"],
 });
 
-export const metadata: Metadata = {
-  title: `${SITE.name} — ${SITE.role}`,
-  description: `Portfolio de ${SITE.name}, ${SITE.role.toLowerCase()}.`,
-};
+async function getIdentity() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("site_settings")
+    .select("site_name, site_role")
+    .eq("id", 1)
+    .maybeSingle();
+  const settings = data as Pick<SiteSettings, "site_name" | "site_role"> | null;
+  return {
+    name: settings?.site_name ?? SITE.name,
+    role: settings?.site_role ?? SITE.role,
+  };
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export async function generateMetadata(): Promise<Metadata> {
+  const { name, role } = await getIdentity();
+  return {
+    title: `${name} — ${role}`,
+    description: `Portfolio de ${name}, ${role.toLowerCase()}.`,
+  };
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { name } = await getIdentity();
+
   return (
     <html
       lang="fr"
@@ -32,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <footer className="label-eyebrow border-t border-border/60 px-6 py-8 text-center text-brand-ink-muted">
-          © {new Date().getFullYear()} {SITE.name}
+          © {new Date().getFullYear()} {name}
         </footer>
         <Toaster />
       </body>

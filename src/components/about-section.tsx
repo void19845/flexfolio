@@ -1,18 +1,42 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ABOUT_CONTENT } from "@/lib/site-config";
 import { CVCard } from "@/components/cv-card";
+import type { CVEntry } from "@/lib/types";
 
-export function AboutSection({ profileImageUrl }: { profileImageUrl: string | null }) {
+export function AboutSection({
+  profileImageUrl,
+  heading,
+  paragraphs,
+  ctaLabel,
+  ctaHref,
+  cvName,
+  cvSubtitle,
+  experience,
+  education,
+  skills,
+  software,
+  languages,
+}: {
+  profileImageUrl: string | null;
+  heading: string;
+  paragraphs: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  cvName: string;
+  cvSubtitle: string;
+  experience: CVEntry[];
+  education: CVEntry[];
+  skills: string[];
+  software: string[];
+  languages: string[];
+}) {
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-12 sm:px-8 lg:flex-row lg:gap-16 lg:py-20">
       <div className="flex flex-col gap-6 lg:w-[60%]">
-        <h1 className="font-serif text-4xl text-brand-ink sm:text-5xl">
-          {ABOUT_CONTENT.heading}
-        </h1>
+        <h1 className="font-serif text-4xl text-brand-ink sm:text-5xl">{heading}</h1>
 
         <div className="flex flex-col gap-5 text-base leading-relaxed text-brand-ink sm:text-[15px]">
-          {ABOUT_CONTENT.paragraphs.map((paragraph, index) => (
+          {paragraphs.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
         </div>
@@ -30,15 +54,23 @@ export function AboutSection({ profileImageUrl }: { profileImageUrl: string | nu
         )}
 
         <Link
-          href={ABOUT_CONTENT.ctaHref}
+          href={ctaHref}
           className="label-eyebrow mt-2 w-fit border-b border-brand-ink pb-1 hover:text-brand-accent hover:border-brand-accent"
         >
-          {ABOUT_CONTENT.ctaLabel}
+          {ctaLabel}
         </Link>
       </div>
 
       <div className="lg:w-[40%]">
-        <CVCard />
+        <CVCard
+          name={cvName}
+          subtitle={cvSubtitle}
+          experience={experience}
+          education={education}
+          skills={skills}
+          software={software}
+          languages={languages}
+        />
       </div>
     </section>
   );

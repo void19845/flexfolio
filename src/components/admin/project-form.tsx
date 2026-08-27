@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -29,10 +29,7 @@ export function ProjectForm({
 }) {
   const router = useRouter();
 
-  const [id, setId] = useState(initialProject?.id ?? "");
-  useEffect(() => {
-    if (!id) setId(crypto.randomUUID());
-  }, [id]);
+  const [id] = useState(() => initialProject?.id ?? crypto.randomUUID());
 
   const [title, setTitle] = useState(initialProject?.title ?? "");
   const [slug, setSlug] = useState(initialProject?.slug ?? "");
@@ -52,10 +49,6 @@ export function ProjectForm({
   );
   const [images, setImages] = useState<EditableImage[]>(initialImages);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!slugTouched) setSlug(slugify(title));
-  }, [title, slugTouched]);
 
   function patchImage(key: string, patch: Partial<EditableImage>) {
     setImages((prev) => prev.map((img) => (img.key === key ? { ...img, ...patch } : img)));
@@ -140,7 +133,15 @@ export function ProjectForm({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="title">Titre</Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (!slugTouched) setSlug(slugify(e.target.value));
+              }}
+              required
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="slug">Slug</Label>

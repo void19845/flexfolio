@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [{ data: projects }, { data: settings }] = await Promise.all([
+  const [{ data: projects }, { data: settingsData }] = await Promise.all([
     supabase
       .from("projects")
       .select("*, project_images(*)")
@@ -19,14 +19,16 @@ export default async function HomePage() {
     supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
   ]);
 
+  const settings = settingsData as SiteSettings | null;
+
   return (
     <>
       <HeroSection
-        labelLeft={SITE.labelTopLeft}
-        labelRight={SITE.labelTopRight}
-        wordmark={SITE.wordmark}
-        name={SITE.name}
-        imageUrl={(settings as SiteSettings | null)?.hero_image_url ?? null}
+        labelLeft={settings?.label_top_left ?? SITE.labelTopLeft}
+        labelRight={settings?.label_top_right ?? SITE.labelTopRight}
+        wordmark={settings?.wordmark ?? SITE.wordmark}
+        name={settings?.site_name ?? SITE.name}
+        imageUrl={settings?.hero_image_url ?? null}
       />
       <ProjectGrid projects={(projects as ProjectWithImages[] | null) ?? []} />
     </>

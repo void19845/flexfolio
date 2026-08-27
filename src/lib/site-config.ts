@@ -1,9 +1,10 @@
 /**
- * Site-wide copy that isn't stored in Supabase. Only `profile_image_url`
- * and `hero_image_url` are admin-editable (per the brief); everything
- * below is template content meant to be edited here directly for a real
- * client. Name/CV content is intentionally a placeholder, not a real
- * person — swap it for the real bio, photo credits and CV before launch.
+ * Fallback copy only. Since migration 0002, every field below also lives
+ * in the `site_settings` row and is editable from /admin/parametres — the
+ * admin form is the source of truth. These constants exist purely as a
+ * defensive default (e.g. `settings?.site_name ?? SITE.name`) for the
+ * unlikely case a fetch fails or the migration hasn't run yet; editing
+ * values here no longer changes the live site once settings exist in DB.
  */
 
 export const SITE = {

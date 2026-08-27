@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Gallery } from "@/components/gallery";
 import { Badge } from "@/components/ui/badge";
-import type { ProjectWithImages } from "@/lib/types";
+import type { ProjectWithImages, SiteSettings } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -15,15 +15,16 @@ export default async function ProjectPage({
   const { slug } = await params;
   const supabase = await createClient();
 
-  const { data: project } = await supabase
-    .from("projects")
-    .select("*, project_images(*)")
-    .eq("slug", slug)
-    .maybeSingle();
+  const [{ data: project }, { data: settingsData }] = await Promise.all([
+    supabase.from("projects").select("*, project_images(*)").eq("slug", slug).maybeSingle(),
+    supabase.from("site_settings").select("gallery_layout").eq("id", 1).maybeSingle(),
+  ]);
 
   if (!project) notFound();
 
   const p = project as ProjectWithImages;
+  const galleryLayout =
+    (settingsData as Pick<SiteSettings, "gallery_layout"> | null)?.gallery_layout ?? "3x3";
 
   return (
     <article className="mx-auto max-w-5xl pb-20">
@@ -72,7 +73,7 @@ export default async function ProjectPage({
         </p>
       )}
 
-      <Gallery images={p.project_images} />
+      <Gallery images={p.project_images} layout={galleryLayout} />
 
       {p.description_full && (
         <div className="whitespace-pre-line px-4 pt-10 text-base leading-relaxed text-brand-ink sm:px-8">

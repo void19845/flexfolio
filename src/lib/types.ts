@@ -23,6 +23,19 @@ export const IMAGE_POSITIONS: ImagePosition[] = [
   "bottom-right",
 ];
 
+/** Gallery grid disposition on a project page: 3 columns either way,
+ *  "3x2" uses a 3:2 (classic photo) aspect ratio per thumbnail, "3x3" a
+ *  square one — see GALLERY_LAYOUT_LABELS for the admin-facing copy. */
+export type GalleryLayout = "3x2" | "3x3";
+
+export const GALLERY_LAYOUTS: GalleryLayout[] = ["3x2", "3x3"];
+
+export interface CVEntry {
+  period: string;
+  org: string;
+  role: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -58,6 +71,20 @@ export interface SiteSettings {
   id: number;
   profile_image_url: string | null;
   hero_image_url: string | null;
+  site_name: string;
+  site_role: string;
+  label_top_left: string;
+  label_top_right: string;
+  wordmark: string;
+  about_heading: string;
+  about_paragraphs: string[];
+  about_cta_label: string;
+  gallery_layout: GalleryLayout;
+  cv_experience: CVEntry[];
+  cv_education: CVEntry[];
+  cv_skills: string[];
+  cv_software: string[];
+  cv_languages: string[];
   updated_at: string;
 }
 

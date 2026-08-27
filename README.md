@@ -1,13 +1,13 @@
-cd# Portfolio
+# Portfolio
 
-Portfolio modulaire — Next.js 15 (App Router) + Supabase + Tailwind CSS v4,
+Portfolio modulaire — Next.js 16 (App Router) + Supabase + Tailwind CSS v4,
 avec galerie de projets, panel admin (upload multi-images, positionnement
-au pixel) et direction artistique éditoriale (hero asymétrique, page About,
-CV card).
+au pixel, disposition de galerie, contenu About/CV) et direction
+artistique éditoriale (hero asymétrique, page About, CV card).
 
 ## Stack
 
-- Next.js 15 + TypeScript, App Router, Server Actions
+- Next.js 16 + TypeScript, App Router, Server Actions
 - Supabase : Postgres + Storage + Auth
 - Tailwind CSS v4 (tokens définis dans `src/app/globals.css` via `@theme`)
 - Composants UI façon shadcn/ui (écrits localement, voir note plus bas)
@@ -30,12 +30,16 @@ Remplis `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ### 3. Schéma de base de données
 
-Dans le SQL Editor de Supabase, exécute le contenu de
-`supabase/migrations/0001_init.sql`. Ça crée :
+Dans le SQL Editor de Supabase, exécute dans l'ordre le contenu de
+`supabase/migrations/0001_init.sql` puis `0002_editable_content_and_layout.sql`.
+Ça crée :
 
 - `projects`, `project_images`, `site_settings`
 - la contrainte "une seule image featured par projet"
 - le bucket de storage public `project-images` + ses policies RLS
+- (0002) les colonnes `site_settings` pour l'identité, le contenu About,
+  le CV et la disposition de galerie — voir « Contenu à personnaliser »
+  plus bas
 
 ### 4. Compte admin
 
@@ -51,31 +55,62 @@ npm run dev
 ```
 
 Connecte-toi sur `/admin/login`, crée un premier projet, puis va dans
-`/admin/parametres` pour uploader la photo hero (accueil) et la photo de
-profil (About).
+`/admin/parametres` pour uploader les photos (hero + profil) et renseigner
+ton nom, ton rôle, le texte About et ton CV.
 
 ### 6. Déploiement (Vercel)
 
-Connecte le repo à Vercel, ajoute les deux variables d'environnement dans
-les Project Settings, déploie.
+Connecte le repo à Vercel, ajoute les deux variables d'environnement
+(`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) dans les
+Project Settings du projet Vercel — celles de `.env`/`.env.local` ne sont
+pas reprises automatiquement — puis déploie.
+
+**Si le build échoue :** ce repo tourne sur Next.js 16 (voir « Décisions
+techniques » plus bas), qui exige Node.js ≥ 20.9. `package.json` fixe
+`engines.node` à `24.x`, ce qui prend le pas sur le réglage Node.js Version
+des Project Settings, quelle que soit sa valeur actuelle. Si un déploiement
+échoue quand même, va voir le message d'erreur exact dans les build logs
+Vercel — les causes les plus fréquentes sont les deux variables
+d'environnement manquantes (ci-dessus) ou une erreur de build spécifique
+qu'il vaut mieux lire telle quelle que deviner.
 
 ## Contenu à personnaliser
 
-- `src/lib/site-config.ts` — nom, tagline, liens de nav, bio About, contenu
-  du CV (expériences, formation, compétences...). Tout est en placeholder
-  générique ("Prénom Nom", `[Nom du studio]`) : les images de référence
-  fournies montraient un portfolio réel en ligne, traité ici uniquement
-  comme référence de style (mise en page, palette, typo), pas comme
-  contenu à reproduire.
-- Photo hero / photo de profil : éditables depuis `/admin/parametres`
-  (ce sont les deux seuls champs de contenu pilotés depuis la base, comme
-  demandé dans le brief).
+Tout se fait depuis `/admin/parametres`, en base (table `site_settings`) :
+
+- **Photos** — hero (accueil) et profil (About)
+- **Identité** — Prénom Nom, rôle, wordmark, les deux labels du hero
+- **About** — titre, texte (un paragraphe par bloc), texte du lien de
+  retour vers le portfolio
+- **Disposition de galerie** — 3×2 (vignettes 3:2) ou 3×3 (vignettes
+  carrées), 3 colonnes dans les deux cas ; s'applique à la galerie de
+  chaque page projet
+- **CV** — expériences, formation, compétences, logiciels, langues (le nom
+  et le rôle affichés sur la carte CV reprennent ceux du bloc Identité)
+
+`src/lib/site-config.ts` ne reste que comme valeurs de repli si jamais la
+base n'est pas encore migrée (0002) ou une lecture échoue ; l'éditer ne
+change plus rien une fois que `site_settings` est renseigné. Les liens de
+nav (`NAV_LINKS`, dans le même fichier) restent en dur — pas demandés
+comme éditables.
+
+Le contenu par défaut est un placeholder générique ("Prénom Nom",
+`[Nom du studio]`) : les images de référence fournies montraient un
+portfolio réel en ligne, traité ici uniquement comme référence de style
+(mise en page, palette, typo), pas comme contenu à reproduire.
 
 ## Décisions techniques (là où le brief laissait le choix)
 
-- **Next.js pinné en 15.5.x** — `create-next-app` proposait la 16 par
-  défaut au moment de la génération ; le brief demandait explicitement du
-  15.
+- **Next.js 16** (16.3.3 au moment d'écrire ceci) — la génération initiale
+  avait pinné la 15.5.x volontairement (le brief demandait du 15,
+  `create-next-app` proposait la 16 par défaut). Le repo a depuis été
+  mis à jour vers la 16 (`package.json`/`package-lock.json` le confirment)
+  sans que ce README suive, ce qui a fini par désynchroniser `engines`/
+  Node côté Vercel — voir « Déploiement (Vercel) » plus haut. Revenir à
+  la 15 aurait été plus risqué que d'assumer la 16 : le code utilisait
+  déjà les conventions Next 16 (`params` en `Promise`, `proxy.ts` plutôt
+  que `middleware.ts`), donc rester sur 16 et corriger la config Node/
+  Vercel est le chemin le moins perturbateur.
 - **Composants UI "shadcn"** écrits à la main (Radix + CVA + Tailwind,
   mêmes conventions que le CLI) plutôt que générés par `npx shadcn init` —
   son registre distant n'était pas joignable depuis l'environnement où
@@ -90,11 +125,20 @@ les Project Settings, déploie.
   (infos + images) est validé et sauvegardé en un seul submit.
 - **Suppression d'image** : immédiate (storage + ligne DB supprimés au
   clic), indépendante du bouton "Enregistrer".
-- **Galerie de la page projet** : les hauteurs `max-h-[60vh]` / `max-h-[80vh]`
-  du brief sont appliquées comme des hauteurs fixes, pas comme des
-  plafonds — avec une hauteur seulement plafonnée, `object-position`
-  n'a aucun effet visible tant que l'image ne déborde pas, ce qui aurait
-  rendu la grille de positionnement 3×3 inopérante.
+- **Galerie de la page projet** : grille à 3 colonnes (au lieu d'un
+  empilement plein cadre) avec un `aspect-*` fixe par vignette plutôt
+  qu'un plafond — pour la même raison que l'ancienne version en `max-h` :
+  sans hauteur qui force un dépassement réel, `object-position` n'a aucun
+  effet visible, ce qui rendrait la grille de positionnement 3×3
+  (recadrage) inopérante. Clic sur une vignette → lightbox en
+  `object-contain` (image complète, non recadrée).
+- **Disposition "3×2" / "3×3"** (choix admin, `site_settings.gallery_layout`) :
+  3 colonnes dans les deux cas ; interprété comme le *format* de vignette
+  plutôt qu'un nombre de lignes figé — "3×2" = ratio 3:2 (format photo
+  classique), "3×3" = carré. Une galerie affiche donc toutes ses images,
+  disposées 3 par ligne, quel que soit le nombre total ; le nom de chaque
+  disposition vient du nombre de photos qui tiennent à l'écran sans
+  scroller (6 pour un ratio 3:2, 9 pour un carré), pas d'un total figé.
 - **`display_order`** existe en base (tri secondaire de la home) mais
   n'a pas de champ dans le formulaire admin — non demandé dans le brief.
   Reste à `0` sauf modification manuelle en SQL.
@@ -102,8 +146,12 @@ les Project Settings, déploie.
   tokens dans `globals.css` (bloc `@theme`) — le fichier config sert de
   miroir typé pour l'éditeur/outillage, pas de source de vérité.
 
-## Point de vigilance
+## Historique : incident `next lint`
 
-`next lint` remonte une erreur de résolution de plugin ESLint (mélange
-eslint 9 / eslint-config-next 15.5 issu du repin de version). `next build`
-et `next dev` ne sont pas affectés. Si ça gêne : `npm install eslint@8`.
+`eslint-config-next` était resté sur `^15.5.24` alors que `next` tournait
+déjà en 16.x (même désynchronisation que le point Next.js 16 ci-dessus) :
+`next lint` plantait sur une résolution de plugin ESLint. Corrigé en
+alignant `eslint-config-next` sur `^16.3.3` — son export map a changé
+entre les deux versions (`eslint-config-next/core-web-vitals` sans
+extension `.js`, `eslint.config.mjs` mis à jour en conséquence).
+`next build` et `next dev` n'avaient jamais été affectés.
