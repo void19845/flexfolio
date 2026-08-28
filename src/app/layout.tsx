@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE } from "@/lib/site-config";
 import { createClient } from "@/lib/supabase/server";
 import type { SiteSettings } from "@/lib/types";
+import { Analytics } from "@vercel/analytics/next";
 
 const fontDisplay = Playfair_Display({
   variable: "--font-display",
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           © {new Date().getFullYear()} {name}
         </footer>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
