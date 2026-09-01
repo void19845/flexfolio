@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
+import { FileTextIcon } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { updateSiteSettings } from "@/actions/site-settings";
@@ -10,11 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { TagInput } from "@/components/admin/tag-input";
 import { GalleryLayoutToggle } from "@/components/admin/gallery-layout-toggle";
-import { CVEntryList } from "@/components/admin/cv-entry-list";
-import { SITE, ABOUT_CONTENT, CV } from "@/lib/site-config";
-import type { CVEntry, GalleryLayout, SiteSettings } from "@/lib/types";
+import { SocialLinksList } from "@/components/admin/social-links-list";
+import { ColorField } from "@/components/admin/color-field";
+import { SITE, ABOUT_CONTENT, CONTACT, PALETTE } from "@/lib/site-config";
+import { extractStoragePath, fileNameFromStoragePath } from "@/lib/storage-path";
+import type { GalleryLayout, SiteSettings, SocialLink } from "@/lib/types";
 
 const BUCKET = "project-images";
 
@@ -98,6 +100,91 @@ function PhotoField({
   );
 }
 
+function CvPdfField({ currentUrl }: { currentUrl: string | null }) {
+  const [url, setUrl] = useState(currentUrl);
+  const [uploading, setUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(file: File) {
+    if (file.type !== "application/pdf") {
+      toast.error("Le CV doit être un fichier PDF.");
+      return;
+    }
+
+    setUploading(true);
+    const supabase = createClient();
+    // uuid immediately before the filename, as the last path segment —
+    // matches the convention fileNameFromStoragePath expects (see below).
+    const path = `site/cv-pdf/${crypto.randomUUID()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, {
+      cacheControl: "3600",
+    });
+
+    if (uploadError) {
+      toast.error(uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(BUCKET).getPublicUrl(path);
+
+    const { error } = await updateSiteSettings({ cvPdfUrl: publicUrl });
+    setUploading(false);
+
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
+    setUrl(publicUrl);
+    toast.success("CV mis à jour.");
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>Fichier CV (PDF)</Label>
+      <div className="flex max-w-xs items-center gap-3 border border-border p-3 text-sm">
+        <FileTextIcon className="h-5 w-5 shrink-0 text-brand-ink-muted" />
+        {url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="truncate text-brand-ink underline underline-offset-2 hover:text-brand-accent"
+          >
+            {fileNameFromStoragePath(extractStoragePath(url, BUCKET))}
+          </a>
+        ) : (
+          <span className="text-brand-ink-muted">Aucun CV envoyé</span>
+        )}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="w-fit"
+        disabled={uploading}
+        onClick={() => inputRef.current?.click()}
+      >
+        {uploading ? "Envoi..." : "Remplacer"}
+      </Button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void handleFile(file);
+          e.target.value = "";
+        }}
+      />
+    </div>
+  );
+}
+
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="text-sm font-semibold uppercase tracking-[0.1em] text-brand-ink-muted">
@@ -129,13 +216,16 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
     settings?.gallery_layout ?? "3x3",
   );
 
-  const [experience, setExperience] = useState<CVEntry[]>(
-    settings?.cv_experience ?? CV.experience,
+  const [contactEmail, setContactEmail] = useState(settings?.contact_email ?? CONTACT.email);
+  const [contactPhone, setContactPhone] = useState(settings?.contact_phone ?? CONTACT.phone);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
+    settings?.social_links ?? CONTACT.socialLinks,
   );
-  const [education, setEducation] = useState<CVEntry[]>(settings?.cv_education ?? CV.education);
-  const [skills, setSkills] = useState<string[]>(settings?.cv_skills ?? CV.skills);
-  const [software, setSoftware] = useState<string[]>(settings?.cv_software ?? CV.software);
-  const [languages, setLanguages] = useState<string[]>(settings?.cv_languages ?? CV.languages);
+
+  const [paletteBg, setPaletteBg] = useState(settings?.palette_bg ?? PALETTE.bg);
+  const [paletteInk, setPaletteInk] = useState(settings?.palette_ink ?? PALETTE.ink);
+  const [paletteCard, setPaletteCard] = useState(settings?.palette_card ?? PALETTE.card);
+  const [paletteAccent, setPaletteAccent] = useState(settings?.palette_accent ?? PALETTE.accent);
 
   const [saving, setSaving] = useState(false);
 
@@ -156,11 +246,13 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
         .filter(Boolean),
       aboutCtaLabel,
       galleryLayout,
-      cvExperience: experience,
-      cvEducation: education,
-      cvSkills: skills,
-      cvSoftware: software,
-      cvLanguages: languages,
+      contactEmail,
+      contactPhone,
+      socialLinks,
+      paletteBg,
+      paletteInk,
+      paletteCard,
+      paletteAccent,
     });
 
     setSaving(false);
@@ -188,6 +280,7 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
             field="heroImageUrl"
           />
         </div>
+        <CvPdfField currentUrl={settings?.cv_pdf_url ?? null} />
       </section>
 
       <Separator />
@@ -273,41 +366,57 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
 
         <Separator />
 
-        <section className="flex flex-col gap-6">
+        <section className="flex flex-col gap-4">
           <div>
-            <SectionHeading>CV (carte About)</SectionHeading>
+            <SectionHeading>Contact (carte About)</SectionHeading>
             <p className="mt-1 text-sm text-brand-ink-muted">
-              Utilise le Prénom Nom et le rôle définis dans « Identité » ci-dessus.
+              Affichés sur la carte About avec le Prénom Nom et le rôle définis dans « Identité »
+              — laisser vide pour ne rien afficher.
             </p>
           </div>
-
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="contact_email">E-mail</Label>
+              <Input
+                id="contact_email"
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                placeholder="contact@exemple.com"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="contact_phone">Téléphone</Label>
+              <Input
+                id="contact_phone"
+                type="tel"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="+33 6 00 00 00 00"
+              />
+            </div>
+          </div>
           <div className="flex flex-col gap-2">
-            <Label>Expériences professionnelles</Label>
-            <CVEntryList
-              entries={experience}
-              onChange={setExperience}
-              addLabel="Ajouter une expérience"
-            />
+            <Label>Réseaux sociaux</Label>
+            <SocialLinksList links={socialLinks} onChange={setSocialLinks} />
           </div>
+        </section>
 
-          <div className="flex flex-col gap-2">
-            <Label>Formation</Label>
-            <CVEntryList entries={education} onChange={setEducation} addLabel="Ajouter une formation" />
+        <Separator />
+
+        <section className="flex flex-col gap-4">
+          <div>
+            <SectionHeading>Palette de couleurs</SectionHeading>
+            <p className="mt-1 text-sm text-brand-ink-muted">
+              S&apos;applique à tout le site. « Carte » est le fond de la carte CV/contact sur la
+              page About.
+            </p>
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label>Compétences</Label>
-            <TagInput tags={skills} onChange={setSkills} />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label>Logiciels</Label>
-            <TagInput tags={software} onChange={setSoftware} />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label>Langues</Label>
-            <TagInput tags={languages} onChange={setLanguages} />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <ColorField label="Fond" value={paletteBg} onChange={setPaletteBg} />
+            <ColorField label="Texte" value={paletteInk} onChange={setPaletteInk} />
+            <ColorField label="Carte" value={paletteCard} onChange={setPaletteCard} />
+            <ColorField label="Accent" value={paletteAccent} onChange={setPaletteAccent} />
           </div>
         </section>
 

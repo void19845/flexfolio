@@ -14,11 +14,13 @@ import type { EditableImage, ImageOrientation, ImagePosition } from "@/lib/types
 
 export function ImageCard({
   image,
+  position,
   onPatch,
   onSetFeatured,
   onRemove,
 }: {
   image: EditableImage;
+  position: number;
   onPatch: (key: string, patch: Partial<EditableImage>) => void;
   onSetFeatured: (key: string) => void;
   onRemove: (key: string) => void;
@@ -31,7 +33,7 @@ export function ImageCard({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "flex w-64 shrink-0 flex-col gap-3 border border-border bg-card p-3",
+        "flex w-full flex-col gap-3 border border-border bg-card p-3",
         isDragging && "opacity-60",
       )}
     >
@@ -65,10 +67,16 @@ export function ImageCard({
           src={image.publicUrl}
           alt=""
           fill
-          sizes="256px"
+          sizes="(min-width: 640px) 33vw, 50vw"
           style={{ objectPosition: positionToObjectPosition(image.position) }}
           className="object-cover"
         />
+        <span
+          className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center bg-black/70 text-[11px] font-medium text-white"
+          title={`Position ${position} dans la grille publique`}
+        >
+          {position}
+        </span>
       </div>
 
       <label className="flex items-center gap-2 text-xs">

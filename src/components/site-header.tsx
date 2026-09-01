@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/site-config";
 
-export function SiteHeader() {
+export function SiteHeader({ name }: { name: string }) {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-center border-b border-border/60 bg-background/90 py-4 backdrop-blur">
       <nav className="flex items-center gap-8">
-        <Link href="/" aria-label="Accueil" className="text-lg leading-none">
-          👀
+        <Link
+          href="/"
+          aria-label="Accueil"
+          className="font-serif text-lg leading-none tracking-tight text-brand-ink"
+        >
+          {name}
         </Link>
         <ul className="flex items-center gap-6">
           {NAV_LINKS.map((link) => (

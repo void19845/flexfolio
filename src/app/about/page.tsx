@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AboutSection } from "@/components/about-section";
-import { SITE, ABOUT_CONTENT, CV } from "@/lib/site-config";
+import { SITE, ABOUT_CONTENT, CONTACT } from "@/lib/site-config";
 import type { SiteSettings } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -19,11 +19,10 @@ export default async function AboutPage() {
       ctaHref={ABOUT_CONTENT.ctaHref}
       cvName={settings?.site_name ?? SITE.name}
       cvSubtitle={settings?.site_role ?? SITE.role}
-      experience={settings?.cv_experience ?? CV.experience}
-      education={settings?.cv_education ?? CV.education}
-      skills={settings?.cv_skills ?? CV.skills}
-      software={settings?.cv_software ?? CV.software}
-      languages={settings?.cv_languages ?? CV.languages}
+      contactEmail={settings?.contact_email ?? (CONTACT.email || null)}
+      contactPhone={settings?.contact_phone ?? (CONTACT.phone || null)}
+      socialLinks={settings?.social_links ?? CONTACT.socialLinks}
+      cvPdfUrl={settings?.cv_pdf_url ?? null}
     />
   );
 }

@@ -30,10 +30,9 @@ export type GalleryLayout = "3x2" | "3x3";
 
 export const GALLERY_LAYOUTS: GalleryLayout[] = ["3x2", "3x3"];
 
-export interface CVEntry {
-  period: string;
-  org: string;
-  role: string;
+export interface SocialLink {
+  label: string;
+  url: string;
 }
 
 export interface Project {
@@ -80,11 +79,14 @@ export interface SiteSettings {
   about_paragraphs: string[];
   about_cta_label: string;
   gallery_layout: GalleryLayout;
-  cv_experience: CVEntry[];
-  cv_education: CVEntry[];
-  cv_skills: string[];
-  cv_software: string[];
-  cv_languages: string[];
+  cv_pdf_url: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  social_links: SocialLink[];
+  palette_bg: string;
+  palette_ink: string;
+  palette_card: string;
+  palette_accent: string;
   updated_at: string;
 }
 

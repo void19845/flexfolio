@@ -54,21 +54,23 @@ export function Gallery({ images, layout }: { images: ProjectImage[]; layout: Ga
       </div>
 
       <Dialog open={openImage !== null} onOpenChange={(open) => !open && setOpenImage(null)}>
-        <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none sm:max-w-4xl">
+        <DialogContent className="max-w-[95vw] border-none bg-transparent p-0 shadow-none sm:max-w-[95vw]">
           {openImage && (
-            <figure className="flex flex-col gap-3">
+            <figure className="flex flex-col items-center gap-3">
               <DialogTitle className="sr-only">
                 {openImage.caption || "Image agrandie"}
               </DialogTitle>
-              <div className="relative h-[80vh] w-full">
-                <Image
-                  src={openImage.image_url}
-                  alt={openImage.caption ?? ""}
-                  fill
-                  sizes="90vw"
-                  className="object-contain"
-                />
-              </div>
+              {/* Natural sizing, not `fill`: the image keeps its real aspect
+                  ratio and is only ever scaled down (never cropped) to fit
+                  inside the viewport bounds below. */}
+              <Image
+                src={openImage.image_url}
+                alt={openImage.caption ?? ""}
+                width={openImage.image_orientation === "portrait" ? 1000 : 1600}
+                height={openImage.image_orientation === "portrait" ? 1600 : 1000}
+                sizes="90vw"
+                className="h-auto max-h-[85vh] w-auto max-w-full object-contain"
+              />
               {openImage.caption && (
                 <figcaption className="text-center text-sm text-white">
                   {openImage.caption}

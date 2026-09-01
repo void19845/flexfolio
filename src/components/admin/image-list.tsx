@@ -10,7 +10,7 @@ import {
 } from "@dnd-kit/core";
 import {
   SortableContext,
-  horizontalListSortingStrategy,
+  rectSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
 import { ImageCard } from "@/components/admin/image-card";
@@ -52,12 +52,17 @@ export function ImageList({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={images.map((img) => img.key)} strategy={horizontalListSortingStrategy}>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {images.map((image) => (
+      {/* Grid mirrors the public gallery's own 3-column layout (see
+          Gallery in components/gallery.tsx) so reordering here shows
+          directly where each photo will land on the site — no more
+          guessing how a 1-row list maps onto a multi-row grid. */}
+      <SortableContext items={images.map((img) => img.key)} strategy={rectSortingStrategy}>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {images.map((image, index) => (
             <ImageCard
               key={image.key}
               image={image}
+              position={index + 1}
               onPatch={onPatch}
               onSetFeatured={onSetFeatured}
               onRemove={onRemove}

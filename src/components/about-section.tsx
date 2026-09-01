@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CVCard } from "@/components/cv-card";
-import type { CVEntry } from "@/lib/types";
+import type { SocialLink } from "@/lib/types";
 
 export function AboutSection({
   profileImageUrl,
@@ -11,11 +11,10 @@ export function AboutSection({
   ctaHref,
   cvName,
   cvSubtitle,
-  experience,
-  education,
-  skills,
-  software,
-  languages,
+  contactEmail,
+  contactPhone,
+  socialLinks,
+  cvPdfUrl,
 }: {
   profileImageUrl: string | null;
   heading: string;
@@ -24,11 +23,10 @@ export function AboutSection({
   ctaHref: string;
   cvName: string;
   cvSubtitle: string;
-  experience: CVEntry[];
-  education: CVEntry[];
-  skills: string[];
-  software: string[];
-  languages: string[];
+  contactEmail: string | null;
+  contactPhone: string | null;
+  socialLinks: SocialLink[];
+  cvPdfUrl: string | null;
 }) {
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-12 sm:px-8 lg:flex-row lg:gap-16 lg:py-20">
@@ -65,11 +63,10 @@ export function AboutSection({
         <CVCard
           name={cvName}
           subtitle={cvSubtitle}
-          experience={experience}
-          education={education}
-          skills={skills}
-          software={software}
-          languages={languages}
+          contactEmail={contactEmail}
+          contactPhone={contactPhone}
+          socialLinks={socialLinks}
+          cvPdfUrl={cvPdfUrl}
         />
       </div>
     </section>
