@@ -3,7 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isValidHex } from "@/lib/palette";
-import type { GalleryLayout, SocialLink } from "@/lib/types";
+import {
+  BODY_FONTS,
+  TITLE_FONTS,
+  type BodyFont,
+  type GalleryLayout,
+  type SocialLink,
+  type TitleFont,
+} from "@/lib/types";
 
 export async function updateSiteSettings(input: {
   profileImageUrl?: string | null;
@@ -25,6 +32,8 @@ export async function updateSiteSettings(input: {
   paletteInk?: string;
   paletteCard?: string;
   paletteAccent?: string;
+  fontTitle?: TitleFont;
+  fontBody?: BodyFont;
 }): Promise<{ error: string | null }> {
   const supabase = await createClient();
 
@@ -37,6 +46,13 @@ export async function updateSiteSettings(input: {
     if (value !== undefined && !isValidHex(value)) {
       return { error: `Couleur invalide pour "${field}" — format attendu #rrggbb.` };
     }
+  }
+
+  if (input.fontTitle !== undefined && !TITLE_FONTS.includes(input.fontTitle)) {
+    return { error: "Police de titre invalide." };
+  }
+  if (input.fontBody !== undefined && !BODY_FONTS.includes(input.fontBody)) {
+    return { error: "Police de corps de texte invalide." };
   }
 
   const patch: Record<string, unknown> = {};
@@ -59,12 +75,15 @@ export async function updateSiteSettings(input: {
   if (input.paletteInk !== undefined) patch.palette_ink = input.paletteInk;
   if (input.paletteCard !== undefined) patch.palette_card = input.paletteCard;
   if (input.paletteAccent !== undefined) patch.palette_accent = input.paletteAccent;
+  if (input.fontTitle !== undefined) patch.font_title = input.fontTitle;
+  if (input.fontBody !== undefined) patch.font_body = input.fontBody;
 
   const { error } = await supabase.from("site_settings").update(patch).eq("id", 1);
   if (error) return { error: error.message };
 
-  // Palette lives on the root layout, shared by every route — revalidate
-  // it directly so a color change shows up everywhere, not just on "/".
+  // Palette and typography both live on the root layout, shared by every
+  // route — revalidate it directly so a change shows up everywhere, not
+  // just on "/".
   revalidatePath("/", "layout");
   revalidatePath("/admin/parametres");
   return { error: null };

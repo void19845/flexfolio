@@ -31,15 +31,17 @@ Remplis `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 ### 3. Schéma de base de données
 
 Dans le SQL Editor de Supabase, exécute dans l'ordre le contenu de
-`supabase/migrations/0001_init.sql` puis `0002_editable_content_and_layout.sql`.
-Ça crée :
+`supabase/migrations/0001_init.sql`, `0002_editable_content_and_layout.sql`,
+`0003_contact_pdf_and_palette.sql` puis `0004_typography.sql`. Ça crée :
 
 - `projects`, `project_images`, `site_settings`
 - la contrainte "une seule image featured par projet"
 - le bucket de storage public `project-images` + ses policies RLS
-- (0002) les colonnes `site_settings` pour l'identité, le contenu About,
-  le CV et la disposition de galerie — voir « Contenu à personnaliser »
-  plus bas
+- (0002) les colonnes `site_settings` pour l'identité, le contenu About
+  et la disposition de galerie — voir « Contenu à personnaliser » plus bas
+- (0003) le CV en PDF, les infos de contact, les réseaux sociaux et la
+  palette de couleurs
+- (0004) le choix de police (titres / corps de texte)
 
 ### 4. Compte admin
 
@@ -85,8 +87,15 @@ Tout se fait depuis `/admin/parametres`, en base (table `site_settings`) :
 - **Disposition de galerie** — 3×2 (vignettes 3:2) ou 3×3 (vignettes
   carrées), 3 colonnes dans les deux cas ; s'applique à la galerie de
   chaque page projet
-- **CV** — expériences, formation, compétences, logiciels, langues (le nom
-  et le rôle affichés sur la carte CV reprennent ceux du bloc Identité)
+- **CV** — un PDF téléversé (le nom et le rôle affichés sur la carte CV
+  reprennent ceux du bloc Identité)
+- **Contact** — e-mail, téléphone, réseaux sociaux ; affichés sur la carte
+  CV/About, laisser vide pour ne rien afficher
+- **Palette de couleurs** — fond, texte, carte, accent (4 couleurs en
+  hex) ; s'applique à tout le site
+- **Typographie** — police des titres et police du corps de texte,
+  chacune au choix entre deux options préchargées (voir « Décisions
+  techniques »)
 
 `src/lib/site-config.ts` ne reste que comme valeurs de repli si jamais la
 base n'est pas encore migrée (0002) ou une lecture échoue ; l'éditer ne
@@ -139,6 +148,17 @@ portfolio réel en ligne, traité ici uniquement comme référence de style
   disposées 3 par ligne, quel que soit le nombre total ; le nom de chaque
   disposition vient du nombre de photos qui tiennent à l'écran sans
   scroller (6 pour un ratio 3:2, 9 pour un carré), pas d'un total figé.
+- **Police "titres" / "corps de texte"** (choix admin,
+  `site_settings.font_title` / `font_body`) : next/font/google charge et
+  auto-héberge chaque police au build, il ne peut donc pas aller chercher
+  un nom de police arbitraire à l'exécution — même contrainte que pour la
+  disposition de galerie ci-dessus, donc même solution : deux options
+  préchargées par rôle (Playfair Display / Give You Glory pour les
+  titres, Inter / Quicksand pour le corps), choisies dans `layout.tsx` et
+  aliasées à `--font-display`/`--font-body` via le même mécanisme
+  d'override inline sur `<html>` que la palette de couleurs. Le
+  prénom/nom du hero suit délibérément le corps de texte, pas les
+  titres — seul le wordmark ("Portfolio") reste sur la police de titre.
 - **`display_order`** existe en base (tri secondaire de la home) mais
   n'a pas de champ dans le formulaire admin — non demandé dans le brief.
   Reste à `0` sauf modification manuelle en SQL.

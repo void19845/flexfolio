@@ -14,9 +14,22 @@ import { Separator } from "@/components/ui/separator";
 import { GalleryLayoutToggle } from "@/components/admin/gallery-layout-toggle";
 import { SocialLinksList } from "@/components/admin/social-links-list";
 import { ColorField } from "@/components/admin/color-field";
-import { SITE, ABOUT_CONTENT, CONTACT, PALETTE } from "@/lib/site-config";
+import { FontToggle } from "@/components/admin/font-toggle";
+import { SITE, ABOUT_CONTENT, CONTACT, PALETTE, TYPOGRAPHY } from "@/lib/site-config";
 import { extractStoragePath, fileNameFromStoragePath } from "@/lib/storage-path";
-import type { GalleryLayout, SiteSettings, SocialLink } from "@/lib/types";
+import {
+  TITLE_FONTS,
+  BODY_FONTS,
+  TITLE_FONT_LABELS,
+  BODY_FONT_LABELS,
+  TITLE_FONT_VARS,
+  BODY_FONT_VARS,
+  type BodyFont,
+  type GalleryLayout,
+  type SiteSettings,
+  type SocialLink,
+  type TitleFont,
+} from "@/lib/types";
 
 const BUCKET = "project-images";
 
@@ -227,6 +240,11 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
   const [paletteCard, setPaletteCard] = useState(settings?.palette_card ?? PALETTE.card);
   const [paletteAccent, setPaletteAccent] = useState(settings?.palette_accent ?? PALETTE.accent);
 
+  const [fontTitle, setFontTitle] = useState<TitleFont>(
+    settings?.font_title ?? TYPOGRAPHY.titleFont,
+  );
+  const [fontBody, setFontBody] = useState<BodyFont>(settings?.font_body ?? TYPOGRAPHY.bodyFont);
+
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
@@ -253,6 +271,8 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
       paletteInk,
       paletteCard,
       paletteAccent,
+      fontTitle,
+      fontBody,
     });
 
     setSaving(false);
@@ -417,6 +437,41 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
             <ColorField label="Texte" value={paletteInk} onChange={setPaletteInk} />
             <ColorField label="Carte" value={paletteCard} onChange={setPaletteCard} />
             <ColorField label="Accent" value={paletteAccent} onChange={setPaletteAccent} />
+          </div>
+        </section>
+
+        <Separator />
+
+        <section className="flex flex-col gap-4">
+          <div>
+            <SectionHeading>Typographie</SectionHeading>
+            <p className="mt-1 text-sm text-brand-ink-muted">
+              S&apos;applique à tout le site. « Titres » couvre le wordmark, les intitulés de
+              page et le nom dans l&apos;entête ; « Corps de texte » couvre le texte courant, les
+              petits libellés en haut de l&apos;accueil, et le prénom/nom sous la photo hero.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Titres</Label>
+            <FontToggle
+              ariaLabel="Police des titres"
+              options={TITLE_FONTS}
+              labels={TITLE_FONT_LABELS}
+              previewVars={TITLE_FONT_VARS}
+              value={fontTitle}
+              onChange={setFontTitle}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Corps de texte</Label>
+            <FontToggle
+              ariaLabel="Police du corps de texte"
+              options={BODY_FONTS}
+              labels={BODY_FONT_LABELS}
+              previewVars={BODY_FONT_VARS}
+              value={fontBody}
+              onChange={setFontBody}
+            />
           </div>
         </section>
 

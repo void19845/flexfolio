@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import type { GalleryLayout, ProjectImage } from "@/lib/types";
 import { positionToObjectPosition } from "@/lib/image-position";
 import { sortedImages } from "@/lib/project-helpers";
@@ -19,18 +20,40 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
  */
 export function Gallery({ images, layout }: { images: ProjectImage[]; layout: GalleryLayout }) {
   const ordered = sortedImages(images);
-  const [openImage, setOpenImage] = useState<ProjectImage | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const openImage = openIndex !== null ? ordered[openIndex] : null;
 
   const aspectClass = layout === "3x2" ? "aspect-[3/2]" : "aspect-square";
+
+  const showPrevious = useCallback(() => {
+    setOpenIndex((current) =>
+      current === null ? current : (current - 1 + ordered.length) % ordered.length,
+    );
+  }, [ordered.length]);
+
+  const showNext = useCallback(() => {
+    setOpenIndex((current) => (current === null ? current : (current + 1) % ordered.length));
+  }, [ordered.length]);
+
+  // Arrow keys mirror the on-screen buttons while the lightbox is open.
+  useEffect(() => {
+    if (openIndex === null) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "ArrowLeft") showPrevious();
+      if (event.key === "ArrowRight") showNext();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openIndex, showPrevious, showNext]);
 
   return (
     <>
       <div className="grid grid-cols-3 gap-1 px-4 sm:gap-2 sm:px-8">
-        {ordered.map((img) => (
+        {ordered.map((img, index) => (
           <button
             key={img.id}
             type="button"
-            onClick={() => setOpenImage(img)}
+            onClick={() => setOpenIndex(index)}
             aria-label={img.caption ? `Agrandir : ${img.caption}` : "Agrandir l'image"}
             className={`group relative ${aspectClass} w-full overflow-hidden bg-secondary`}
           >
@@ -53,30 +76,53 @@ export function Gallery({ images, layout }: { images: ProjectImage[]; layout: Ga
         ))}
       </div>
 
-      <Dialog open={openImage !== null} onOpenChange={(open) => !open && setOpenImage(null)}>
+      <Dialog open={openIndex !== null} onOpenChange={(open) => !open && setOpenIndex(null)}>
         <DialogContent className="max-w-[95vw] border-none bg-transparent p-0 shadow-none sm:max-w-[95vw]">
           {openImage && (
-            <figure className="flex flex-col items-center gap-3">
-              <DialogTitle className="sr-only">
-                {openImage.caption || "Image agrandie"}
-              </DialogTitle>
-              {/* Natural sizing, not `fill`: the image keeps its real aspect
-                  ratio and is only ever scaled down (never cropped) to fit
-                  inside the viewport bounds below. */}
-              <Image
-                src={openImage.image_url}
-                alt={openImage.caption ?? ""}
-                width={openImage.image_orientation === "portrait" ? 1000 : 1600}
-                height={openImage.image_orientation === "portrait" ? 1600 : 1000}
-                sizes="90vw"
-                className="h-auto max-h-[85vh] w-auto max-w-full object-contain"
-              />
-              {openImage.caption && (
-                <figcaption className="text-center text-sm text-white">
-                  {openImage.caption}
-                </figcaption>
+            <>
+              <figure className="flex flex-col items-center gap-3">
+                <DialogTitle className="sr-only">
+                  {openImage.caption || "Image agrandie"}
+                </DialogTitle>
+                {/* Natural sizing, not `fill`: the image keeps its real aspect
+                    ratio and is only ever scaled down (never cropped) to fit
+                    inside the viewport bounds below. */}
+                <Image
+                  src={openImage.image_url}
+                  alt={openImage.caption ?? ""}
+                  width={openImage.image_orientation === "portrait" ? 1000 : 1600}
+                  height={openImage.image_orientation === "portrait" ? 1600 : 1000}
+                  sizes="90vw"
+                  className="h-auto max-h-[85vh] w-auto max-w-full object-contain"
+                />
+                {openImage.caption && (
+                  <figcaption className="text-center text-sm text-white">
+                    {openImage.caption}
+                  </figcaption>
+                )}
+              </figure>
+
+              {ordered.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={showPrevious}
+                    aria-label="Image précédente"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-80 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:left-4"
+                  >
+                    <ChevronLeftIcon className="h-6 w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={showNext}
+                    aria-label="Image suivante"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-80 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-4"
+                  >
+                    <ChevronRightIcon className="h-6 w-6" />
+                  </button>
+                </>
               )}
-            </figure>
+            </>
           )}
         </DialogContent>
       </Dialog>

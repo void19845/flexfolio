@@ -30,6 +30,41 @@ export type GalleryLayout = "3x2" | "3x3";
 
 export const GALLERY_LAYOUTS: GalleryLayout[] = ["3x2", "3x3"];
 
+/** Title/body font pairing for the whole site — title role covers the nav
+ *  name, page headings and the hero wordmark; body role covers running
+ *  text, eyebrow labels, and (deliberately, per spec) the hero
+ *  first/last name. Each option is preloaded via next/font/google in
+ *  layout.tsx, since that API can't fetch an arbitrary font at runtime —
+ *  see TITLE_FONT_VARS / BODY_FONT_VARS for the CSS variable each one
+ *  resolves to. */
+export type TitleFont = "playfair-display" | "give-you-glory";
+export type BodyFont = "inter" | "quicksand";
+
+export const TITLE_FONTS: TitleFont[] = ["playfair-display", "give-you-glory"];
+export const BODY_FONTS: BodyFont[] = ["inter", "quicksand"];
+
+export const TITLE_FONT_LABELS: Record<TitleFont, string> = {
+  "playfair-display": "Playfair Display",
+  "give-you-glory": "Give You Glory",
+};
+
+export const BODY_FONT_LABELS: Record<BodyFont, string> = {
+  inter: "Inter",
+  quicksand: "Quicksand",
+};
+
+/** Bare custom-property names (no `var()` wrapper) — must match the
+ *  `variable:` option passed to each font loader in layout.tsx exactly. */
+export const TITLE_FONT_VARS: Record<TitleFont, string> = {
+  "playfair-display": "--font-display-playfair-display",
+  "give-you-glory": "--font-display-give-you-glory",
+};
+
+export const BODY_FONT_VARS: Record<BodyFont, string> = {
+  inter: "--font-body-inter",
+  quicksand: "--font-body-quicksand",
+};
+
 export interface SocialLink {
   label: string;
   url: string;
@@ -87,6 +122,8 @@ export interface SiteSettings {
   palette_ink: string;
   palette_card: string;
   palette_accent: string;
+  font_title: TitleFont;
+  font_body: BodyFont;
   updated_at: string;
 }
 

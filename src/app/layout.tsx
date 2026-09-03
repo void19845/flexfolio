@@ -1,22 +1,39 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Give_You_Glory, Quicksand } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
-import { SITE, PALETTE } from "@/lib/site-config";
+import { SITE, PALETTE, TYPOGRAPHY } from "@/lib/site-config";
 import { sanitizeHex } from "@/lib/palette";
 import { createClient } from "@/lib/supabase/server";
-import type { SiteSettings } from "@/lib/types";
+import { TITLE_FONT_VARS, BODY_FONT_VARS, type SiteSettings } from "@/lib/types";
 
-const fontDisplay = Playfair_Display({
-  variable: "--font-display",
+// Both options for each role are preloaded here — the admin picks one in
+// /admin/parametres and getTypography() below aliases --font-display /
+// --font-body to it. `variable:` must be a string literal (next/font is a
+// build-time transform), so these have to stay in sync by hand with
+// TITLE_FONT_VARS / BODY_FONT_VARS in src/lib/types.ts.
+const fontDisplayPlayfair = Playfair_Display({
+  variable: "--font-display-playfair-display",
   subsets: ["latin"],
   weight: ["500", "600", "700", "900"],
 });
 
-const fontBody = Inter({
-  variable: "--font-body",
+const fontDisplayGiveYouGlory = Give_You_Glory({
+  variable: "--font-display-give-you-glory",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const fontBodyInter = Inter({
+  variable: "--font-body-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
+const fontBodyQuicksand = Quicksand({
+  variable: "--font-body-quicksand",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
 });
@@ -58,6 +75,28 @@ async function getPalette(): Promise<CSSProperties> {
   } as CSSProperties;
 }
 
+async function getTypography(): Promise<CSSProperties> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("site_settings")
+    .select("font_title, font_body")
+    .eq("id", 1)
+    .maybeSingle();
+  const settings = data as Pick<SiteSettings, "font_title" | "font_body"> | null;
+
+  const titleFont = settings?.font_title ?? TYPOGRAPHY.titleFont;
+  const bodyFont = settings?.font_body ?? TYPOGRAPHY.bodyFont;
+
+  // Same inline-style-on-<html> override as getPalette() above — aliases
+  // --font-display / --font-body (read everywhere via --font-serif /
+  // --font-sans in globals.css) to whichever preloaded variable the
+  // admin picked.
+  return {
+    "--font-display": `var(${TITLE_FONT_VARS[titleFont]})`,
+    "--font-body": `var(${BODY_FONT_VARS[bodyFont]})`,
+  } as CSSProperties;
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const { name, role } = await getIdentity();
   return {
@@ -67,13 +106,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [{ name }, paletteStyle] = await Promise.all([getIdentity(), getPalette()]);
+  const [{ name }, paletteStyle, typographyStyle] = await Promise.all([
+    getIdentity(),
+    getPalette(),
+    getTypography(),
+  ]);
 
   return (
     <html
       lang="fr"
-      className={`${fontDisplay.variable} ${fontBody.variable} h-full antialiased`}
-      style={paletteStyle}
+      className={`${fontDisplayPlayfair.variable} ${fontDisplayGiveYouGlory.variable} ${fontBodyInter.variable} ${fontBodyQuicksand.variable} h-full antialiased`}
+      style={{ ...paletteStyle, ...typographyStyle }}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <SiteHeader name={name} />

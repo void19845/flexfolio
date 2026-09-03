@@ -40,7 +40,7 @@ export function HeroSection({ labelLeft, labelRight, wordmark, name, imageUrl }:
         <h1 className="font-serif text-[clamp(3.25rem,15vw,9rem)] font-black leading-[0.85] tracking-tight text-brand-ink">
           {wordmark}
         </h1>
-        <div className="pr-2 pb-1 text-right font-serif text-2xl leading-tight text-brand-ink sm:pr-6 sm:text-3xl">
+        <div className="pr-2 pb-1 text-right font-sans text-2xl leading-tight text-brand-ink sm:pr-6 sm:text-3xl">
           <p>{firstName}</p>
           {lastName && <p>{lastName}</p>}
         </div>

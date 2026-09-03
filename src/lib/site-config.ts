@@ -48,3 +48,11 @@ export const PALETTE = {
   card: "#3d2b2b",
   accent: "#8b4513",
 };
+
+/** Same defensive-fallback role as PALETTE above — mirrors the
+ *  migration 0004 column defaults, not the live source of truth once a
+ *  settings row exists. */
+export const TYPOGRAPHY = {
+  titleFont: "give-you-glory",
+  bodyFont: "quicksand",
+} as const;
