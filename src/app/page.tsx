@@ -14,8 +14,8 @@ export default async function HomePage() {
       .from("projects")
       .select("*, project_images(*)")
       .eq("is_visible", true)
-      .order("created_at", { ascending: true })
-      .order("display_order", { ascending: true }),
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true }),
     supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
   ]);
 

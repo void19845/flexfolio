@@ -142,6 +142,29 @@ export async function deleteProject(id: string): Promise<{ error: string | null 
   return { error: null };
 }
 
+/** Persists a new project order after a drag-and-drop reorder in the admin
+ *  table. `orderedIds` is the full list of project ids in their new
+ *  display order — index in the array becomes the new `display_order`. */
+export async function reorderProjects(orderedIds: string[]): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Session expirée, reconnecte-toi." };
+
+  const updates = orderedIds.map((id, index) =>
+    supabase.from("projects").update({ display_order: index }).eq("id", id),
+  );
+  const results = await Promise.all(updates);
+  const failed = results.find((r) => r.error);
+  if (failed?.error) return { error: `Erreur lors du réordonnancement : ${failed.error.message}` };
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { error: null };
+}
+
 export async function toggleVisibility(
   id: string,
   isVisible: boolean,

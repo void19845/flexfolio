@@ -11,8 +11,8 @@ export default async function AdminDashboardPage() {
   const { data: projects } = await supabase
     .from("projects")
     .select("*, project_images(*)")
-    .order("created_at", { ascending: true })
-    .order("display_order", { ascending: true });
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: true });
 
   return (
     <div className="flex flex-col gap-6">

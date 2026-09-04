@@ -1,0 +1,89 @@
+import type { Metadata } from "next";
+import { Separator } from "@/components/ui/separator";
+import { SITE, CONTACT } from "@/lib/site-config";
+
+// Deliberately static: no Supabase call, no cookies(), no dynamic export.
+// This page doesn't need admin-editable content, so it stays a plain
+// build-time-rendered route — see the footer link in layout.tsx, routed
+// here through a Proxy redirect (src/proxy.ts, /mentions-legales -> /legal).
+export const metadata: Metadata = {
+  title: `Crédits, mentions légales & RGPD — ${SITE.name}`,
+  description: "Crédits, mentions légales et informations RGPD de ce site.",
+};
+
+export default function LegalPage() {
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col gap-12 px-4 py-16 sm:px-8 sm:py-20">
+      <header className="flex flex-col gap-3">
+        <span className="label-eyebrow text-brand-ink-muted">Informations</span>
+        <h1 className="font-serif text-4xl text-brand-ink sm:text-5xl">
+          Crédits, mentions légales & RGPD
+        </h1>
+      </header>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-serif text-2xl text-brand-ink">Crédits</h2>
+        <div className="flex flex-col gap-3 text-base leading-relaxed text-brand-ink-muted sm:text-[15px]">
+          <p>
+            Site conçu, développé et maintenu par {SITE.name}, réalisé avec Next.js,
+            Supabase et Tailwind CSS.
+          </p>
+          <p>
+            Les photographies et visuels présentés sur ce portfolio sont la propriété
+            de leur auteur·ice et ne peuvent être réutilisés sans autorisation
+            préalable.
+          </p>
+        </div>
+      </section>
+
+      <Separator />
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-serif text-2xl text-brand-ink">Mentions légales</h2>
+        <div className="flex flex-col gap-3 text-base leading-relaxed text-brand-ink-muted sm:text-[15px]">
+          <p>
+            <strong className="text-brand-ink">Éditeur du site : </strong>
+            {SITE.name}
+            {CONTACT.email && <> — {CONTACT.email}</>}.
+          </p>
+          <p>
+            <strong className="text-brand-ink">Hébergement : </strong>
+            [à compléter — raison sociale, adresse et contact de l’hébergeur].
+          </p>
+          <p>
+            <strong className="text-brand-ink">Directeur de la publication : </strong>
+            {SITE.name}.
+          </p>
+          <p>
+            Ce site est un portfolio personnel. Toute reproduction, même partielle, de
+            son contenu (textes, images, mise en page) est interdite sans autorisation
+            écrite préalable.
+          </p>
+        </div>
+      </section>
+
+      <Separator />
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-serif text-2xl text-brand-ink">
+          Protection des données (RGPD)
+        </h2>
+        <div className="flex flex-col gap-3 text-base leading-relaxed text-brand-ink-muted sm:text-[15px]">
+          <p>
+            Ce site ne collecte aucune donnée personnelle à des fins commerciales. Les
+            seules données susceptibles d’être traitées sont celles transmises
+            volontairement via le formulaire ou l’adresse de contact, dans le seul but
+            d’échanger au sujet d’un projet.
+          </p>
+          <p>
+            Conformément au Règlement général sur la protection des données (RGPD) et à
+            la loi Informatique et Libertés, vous disposez d’un droit d’accès, de
+            rectification et de suppression des données vous concernant. Pour l’exercer,
+            contactez {CONTACT.email || "l’adresse indiquée sur la page contact"}.
+          </p>
+          <p>Ce site n’utilise pas de cookies de suivi ni de traceurs publicitaires tiers.</p>
+        </div>
+      </section>
+    </div>
+  );
+}

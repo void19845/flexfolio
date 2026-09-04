@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { Playfair_Display, Inter, Give_You_Glory, Quicksand } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE, PALETTE, TYPOGRAPHY } from "@/lib/site-config";
@@ -121,8 +122,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <SiteHeader name={name} />
         <main className="flex-1">{children}</main>
-        <footer className="label-eyebrow border-t border-border/60 px-6 py-8 text-center text-brand-ink-muted">
-          © {new Date().getFullYear()} {name}
+        <footer className="label-eyebrow flex flex-col items-center gap-2 border-t border-border/60 px-6 py-8 text-center text-brand-ink-muted">
+          <span>© {new Date().getFullYear()} {name}</span>
+          <Link href="/mentions-legales" className="hover:text-brand-accent">
+            Crédits, mentions légales & RGPD
+          </Link>
         </footer>
         <Toaster />
       </body>

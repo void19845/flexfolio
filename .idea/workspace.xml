@@ -4,19 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2810c5e-5457-4724-af8a-f9a133f844ec" name="Changes" comment="addition of new setting">
+    <list default="true" id="f2810c5e-5457-4724-af8a-f9a133f844ec" name="Changes" comment="addition of new setting bys (font and typographie )">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/actions/site-settings.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/actions/site-settings.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/about-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/about-section.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/site-settings-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/site-settings-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/gallery.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/gallery.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hero-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/hero-section.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/project-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/project-card.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/project-helpers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/project-helpers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/site-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/site-config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +84,9 @@
       <workItem from="1787784010798" duration="3388000" />
       <workItem from="1787787550001" duration="4184000" />
       <workItem from="1788245142428" duration="397000" />
-      <workItem from="1788245617038" duration="1390000" />
+      <workItem from="1788245617038" duration="2465000" />
+      <workItem from="1788437902481" duration="14000" />
+      <workItem from="1788441127082" duration="1435000" />
     </task>
     <task id="LOCAL-00001" summary="update of the package">
       <option name="closed" value="true" />
@@ -201,7 +192,15 @@
       <option name="project" value="LOCAL" />
       <updated>1788245675737</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="addition of new setting bys (font and typographie )">
+      <option name="closed" value="true" />
+      <created>1788436415616</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1788436415616</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,6 +210,7 @@
     <MESSAGE value="update of the package" />
     <MESSAGE value="update of the package and bud fixz" />
     <MESSAGE value="addition of new setting" />
-    <option name="LAST_COMMIT_MESSAGE" value="addition of new setting" />
+    <MESSAGE value="addition of new setting bys (font and typographie )" />
+    <option name="LAST_COMMIT_MESSAGE" value="addition of new setting bys (font and typographie )" />
   </component>
 </project>
