@@ -54,8 +54,8 @@ admin depuis Authentication → Users → Add user dans le dashboard Supabase
 (email + mot de passe), puis donne-lui le droit d'administrer Flexfolio :
 super admin de la suite (en SQL, voir le README de flexstaff) ou rôle
 `admin` de l'appli `flexfolio` (`npm run role -- email flexfolio admin`
-dans flexstaff). Sans ce droit, la base refuse toute modification du
-portfolio (RLS).
+dans flexstaff). Un compte connecté sans ce droit ne peut ni entrer dans
+`/admin` ni modifier le portfolio : la base le refuse (RLS).
 
 ### 5. Lancer en local
 
