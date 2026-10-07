@@ -151,6 +151,11 @@ alter table public.site_settings
   add constraint site_settings_font_title_not_blank check (length(trim(font_title)) > 0),
   add constraint site_settings_font_body_not_blank check (length(trim(font_body)) > 0);
 
+-- Thème Flexdesign lié (null = palette et typographie ci-dessus). Pas de clé étrangère : Flexdesign est
+-- facultatif, et un thème supprimé ou introuvable ramène simplement la palette et la typographie du site.
+alter table public.site_settings
+  add column if not exists design_theme_id uuid;
+
 insert into public.site_settings (id)
 values (1)
 on conflict (id) do nothing;

@@ -220,7 +220,14 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }) {
+export function SiteSettingsForm({
+  settings,
+  designThemes,
+}: {
+  settings: SiteSettings | null;
+  /** Flexdesign themes, null when Flexdesign can't be read */
+  designThemes: { id: string; name: string }[] | null;
+}) {
   const [siteName, setSiteName] = useState(settings?.site_name ?? SITE.name);
   const [siteRole, setSiteRole] = useState(settings?.site_role ?? SITE.role);
   const [wordmark, setWordmark] = useState(settings?.wordmark ?? SITE.wordmark);
@@ -257,6 +264,10 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
   const [fontTitle, setFontTitle] = useState(settings?.font_title ?? TYPOGRAPHY.titleFont);
   const [fontBody, setFontBody] = useState(settings?.font_body ?? TYPOGRAPHY.bodyFont);
 
+  const [designThemeId, setDesignThemeId] = useState(settings?.design_theme_id ?? "");
+  const linkedThemeMissing =
+    designThemeId !== "" && !designThemes?.some((t) => t.id === designThemeId);
+
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
@@ -285,6 +296,7 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
       paletteAccent,
       fontTitle,
       fontBody,
+      designThemeId: designThemeId || null,
     });
 
     setSaving(false);
@@ -443,10 +455,48 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
 
         <section className="flex flex-col gap-4">
           <div>
+            <SectionHeading>Thème Flexdesign</SectionHeading>
+            <p className="mt-1 text-sm text-brand-ink-muted">
+              Facultatif. Un thème lié remplace la palette et la typographie ci-dessous sur tout le
+              site ; elles restent enregistrées et reviennent si tu choisis « Aucun » ou si le thème
+              devient introuvable.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="design_theme_id">Thème</Label>
+            <select
+              id="design_theme_id"
+              value={designThemeId}
+              onChange={(e) => setDesignThemeId(e.target.value)}
+              className="flex h-10 w-full max-w-sm rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">Aucun (palette et typographie du site)</option>
+              {linkedThemeMissing ? (
+                <option value={designThemeId}>Thème lié introuvable</option>
+              ) : null}
+              {designThemes?.map((theme) => (
+                <option key={theme.id} value={theme.id}>
+                  {theme.name}
+                </option>
+              ))}
+            </select>
+            {designThemes === null ? (
+              <p className="text-xs text-brand-ink-muted">
+                Flexdesign n&apos;est pas installé sur cette base : aucun thème à proposer.
+              </p>
+            ) : null}
+          </div>
+        </section>
+
+        <Separator />
+
+        <section className="flex flex-col gap-4">
+          <div>
             <SectionHeading>Palette de couleurs</SectionHeading>
             <p className="mt-1 text-sm text-brand-ink-muted">
               S&apos;applique à tout le site. « Carte » est le fond de la carte CV/contact sur la
               page About.
+              {designThemeId ? " Remplacée par le thème Flexdesign tant qu'il est lié." : ""}
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -466,6 +516,9 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings | null }
               S&apos;applique à tout le site. « Titres » couvre le wordmark, les intitulés de
               page et le nom dans l&apos;entête ; « Corps de texte » couvre le texte courant, les
               petits libellés en haut de l&apos;accueil, et le prénom/nom sous la photo hero.
+              {designThemeId
+                ? " Les polices du thème Flexdesign lié remplacent celles-ci tant qu'il est lié."
+                : ""}
             </p>
           </div>
           <div className="flex flex-col gap-2">

@@ -9,15 +9,20 @@ export const dynamic = "force-dynamic";
 
 export default async function SiteSettingsPage() {
   const supabase = await createClient();
-  const [{ data: settings }, mfaFactors] = await Promise.all([
+  const [{ data: settings }, mfaFactors, { data: designThemes }] = await Promise.all([
     supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
     listVerifiedMfaFactors(),
+    // Flexdesign's public themes; null (error) when Flexdesign isn't installed on this database
+    supabase.from("design_themes").select("id, name").order("name"),
   ]);
 
   return (
     <div className="flex flex-col gap-6">
       <h1 className="font-serif text-2xl text-brand-ink">Paramètres</h1>
-      <SiteSettingsForm settings={settings as SiteSettings | null} />
+      <SiteSettingsForm
+        settings={settings as SiteSettings | null}
+        designThemes={designThemes as { id: string; name: string }[] | null}
+      />
 
       <Separator />
 
