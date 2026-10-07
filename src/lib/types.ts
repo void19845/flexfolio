@@ -114,6 +114,8 @@ export interface SiteSettings {
   palette_accent: string;
   font_title: TitleFont;
   font_body: BodyFont;
+  /** Linked Flexdesign theme (src/lib/design-theme.ts), null = own palette and typography */
+  design_theme_id: string | null;
   updated_at: string;
 }
 

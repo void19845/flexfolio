@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isValidHex } from "@/lib/palette";
 import { sanitizeFontFamily } from "@/lib/typography";
+import { isDesignThemeId } from "@/lib/design-theme";
 import type { BodyFont, GalleryLayout, SocialLink, TitleFont } from "@/lib/types";
 
 export async function updateSiteSettings(input: {
@@ -28,6 +29,7 @@ export async function updateSiteSettings(input: {
   paletteAccent?: string;
   fontTitle?: TitleFont;
   fontBody?: BodyFont;
+  designThemeId?: string | null;
 }): Promise<{ error: string | null }> {
   const supabase = await createClient();
 
@@ -60,6 +62,18 @@ export async function updateSiteSettings(input: {
     }
   }
 
+  if (input.designThemeId !== undefined && input.designThemeId !== null) {
+    if (!isDesignThemeId(input.designThemeId)) {
+      return { error: "Thème Flexdesign invalide." };
+    }
+    const { data: theme } = await supabase
+      .from("design_themes")
+      .select("id")
+      .eq("id", input.designThemeId)
+      .maybeSingle();
+    if (!theme) return { error: "Thème introuvable dans Flexdesign." };
+  }
+
   const patch: Record<string, unknown> = {};
   if (input.profileImageUrl !== undefined) patch.profile_image_url = input.profileImageUrl;
   if (input.heroImageUrl !== undefined) patch.hero_image_url = input.heroImageUrl;
@@ -82,6 +96,7 @@ export async function updateSiteSettings(input: {
   if (input.paletteAccent !== undefined) patch.palette_accent = input.paletteAccent;
   if (input.fontTitle !== undefined) patch.font_title = input.fontTitle.trim();
   if (input.fontBody !== undefined) patch.font_body = input.fontBody.trim();
+  if (input.designThemeId !== undefined) patch.design_theme_id = input.designThemeId;
 
   const { error } = await supabase.from("site_settings").update(patch).eq("id", 1);
   if (error) return { error: error.message };

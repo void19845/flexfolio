@@ -43,6 +43,7 @@ schéma. Ça crée :
 - les colonnes `site_settings` pour l'identité, le contenu About, la
   disposition de galerie, le CV en PDF, le contact, les réseaux sociaux,
   la palette et la typographie — voir « Contenu à personnaliser » plus bas
+- `site_settings.design_theme_id` : thème Flexdesign lié (vide par défaut)
 - le bucket de storage public `project-images` (20 Mo max par fichier,
   images + PDF) + ses policies RLS
 
@@ -137,6 +138,13 @@ Tout se fait depuis `/admin/parametres`, en base (table `site_settings`) :
 - **Typographie** — police des titres et police du corps de texte,
   chacune au choix entre deux options préchargées (voir « Décisions
   techniques »)
+- **Thème Flexdesign** (facultatif, « Aucun » par défaut) — lie le site à
+  un thème de [Flexdesign](https://github.com/void19845/flexdesign). Tant
+  qu'il est lié, ses couleurs du mode clair et ses polices de titre et de
+  texte remplacent la palette et la typographie ci-dessus, qui restent
+  enregistrées et reviennent si le thème est délié, supprimé ou illisible
+  (Flexdesign absent de la base, Supabase injoignable). Voir « Thème
+  Flexdesign » dans « Décisions techniques »
 
 `src/lib/site-config.ts` ne reste que comme valeurs de repli si jamais la
 base n'est pas encore initialisée (`supabase/init.sql`) ou une lecture échoue ; l'éditer ne
@@ -200,6 +208,23 @@ portfolio réel en ligne, traité ici uniquement comme référence de style
   d'override inline sur `<html>` que la palette de couleurs. Le
   prénom/nom du hero suit délibérément le corps de texte, pas les
   titres — seul le wordmark ("Portfolio") reste sur la police de titre.
+- **Thème Flexdesign** (`site_settings.design_theme_id`,
+  `src/lib/design-theme.ts`) : le thème est lu à chaque requête dans les
+  tables publiques `design_*` de Flexdesign (Flexfolio n'y écrit jamais),
+  puis posé par-dessus la palette et la typographie du site avec le même
+  override inline sur `<html>`. Correspondance des rôles :
+  `background` → `--brand-bg`, `text` → `--brand-ink`, `muted` →
+  `--brand-ink-muted`, `primary` / `onPrimary` → `--brand-card` /
+  `--brand-card-foreground` (la carte CV), `accent` → `--brand-accent`,
+  `surface` → `--card` / `--popover`, `border` → `--border` / `--input`,
+  `danger` → `--destructive`. Les polices du thème sont servies par le
+  bucket public `design-fonts` de Supabase (`@font-face` dans un `<style>`) :
+  Google Fonts n'est plus appelé que pour un rôle que le thème ne fournit
+  pas. Couleurs, noms de police et chemins de fichier sont revérifiés avant
+  d'entrer dans le style. Pas de clé étrangère vers `design_themes` :
+  Flexdesign reste facultatif. L'écriture passe par l'action
+  `updateSiteSettings` et la même policy RLS que le reste de
+  `site_settings` (admin Flexfolio).
 - **`display_order`** existe en base (tri secondaire de la home) mais
   n'a pas de champ dans le formulaire admin — non demandé dans le brief.
   Reste à `0` sauf modification manuelle en SQL.
