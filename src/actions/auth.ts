@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { ACCESS_DENIED, isFlexfolioAdmin } from "@/lib/admin-access";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signIn(
@@ -20,6 +21,13 @@ export async function signIn(
 
   if (error) {
     return { error: "Identifiants incorrects." };
+  }
+
+  // The Supabase project is shared across Flex Suite apps: a valid account is
+  // not enough, it needs the Flexfolio admin role (or suite super admin).
+  if (!(await isFlexfolioAdmin(supabase))) {
+    await supabase.auth.signOut();
+    return { error: ACCESS_DENIED };
   }
 
   redirect(next.startsWith("/admin") ? next : "/admin");

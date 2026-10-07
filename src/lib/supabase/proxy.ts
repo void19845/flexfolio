@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isFlexfolioAdmin } from "@/lib/admin-access";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -33,6 +34,20 @@ export async function updateSession(request: NextRequest) {
   const isLoginPage = pathname === "/admin/login";
   const isMfaPage = pathname === "/admin/mfa";
   const isAdminRoute = pathname.startsWith("/admin");
+
+  // Role gate: sessions from accounts without the Flexfolio admin role (e.g.
+  // staff of another Flex Suite app, or a session opened before roles existed)
+  // are signed out and sent back to the login page with an explanation.
+  if (isAdminRoute && user && !(await isFlexfolioAdmin(supabase))) {
+    await supabase.auth.signOut();
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/login";
+    url.search = "?denied=1";
+    const denied = NextResponse.redirect(url);
+    // Carry the cleared session cookies set by signOut() onto the redirect
+    supabaseResponse.cookies.getAll().forEach((cookie) => denied.cookies.set(cookie));
+    return denied;
+  }
 
   if (isAdminRoute && !isLoginPage && !user) {
     const url = request.nextUrl.clone();
